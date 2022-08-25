@@ -9,8 +9,8 @@ int add_last(void **arr, int *len, data_structure *data)
 {
 	int sizeof_data = data->header->len;
 	*arr = realloc(*arr, sizeof_data + sizeof_header);
-	memcpy(*arr+len, data, data->header->len + sizeof_header);
-	len += data->header->len;
+	memcpy(*arr+*len, data, sizeof_data + sizeof_header);
+	*len += sizeof_data + sizeof_header;
 	return 0;
 }
 
