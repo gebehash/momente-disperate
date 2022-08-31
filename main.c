@@ -7,13 +7,21 @@
 
 int add_last(void **arr, int *len, data_structure *data)
 {
+	printf("%p\n", arr);
 	printf("%p\n", *arr);
 	int sizeof_data = data->header->len;
 	*arr = realloc(*arr, sizeof(*arr) + sizeof_data + sizeof_header);
+	printf("%p\n", *arr);
+	char *s = (char *)malloc(200);
+	memcpy(s, data->data, sizeof_data);
+	for (int i = 0; i < sizeof_data; i++)
+		printf("%d ", s[i]);
+	
 	memcpy(*arr, data, sizeof_data + sizeof_header);
 	*len = *len + 1;
+	//printf("date: %s\n", *arr);
 	// for (int i = 0; i <= sizeof(*arr); i++) {
-	// 	printf("%c ", **arr + i);
+	// 	printf("%d ", (*arr + i));
 	// }
 	return 0;
 }
@@ -36,13 +44,14 @@ int delete_at(void **arr, int *len, int index)
 }
 
 data_structure *run_insert() {
-	printf("inceput");
 	char *typestr = strtok(NULL, " ");
 	char *dedicant = strtok(NULL, " ");
 	char *bancnota1 = strtok(NULL, " ");
 	char *bancnota2 = strtok(NULL, " ");
 	char *dedicat = strtok(NULL, " ");
 	int sizeof_data = 0;
+	int b1 = atoi(bancnota1);
+	int b2 = atoi(bancnota2);
 
 	int type = atoi(typestr);
 
@@ -55,17 +64,16 @@ data_structure *run_insert() {
 	}
 
 	data_structure *data = (data_structure *) malloc(sizeof_header);
+	data->data = malloc(sizeof_data);
 	head *h = (head *) malloc(sizeof_header);
 	h->type = type;
 	h->len = sizeof_header + sizeof_data;
-
 	data->header = h;
 
 	memcpy(data->data, dedicant, strlen(dedicant));
-	memcpy(data->data + strlen(dedicant), bancnota1 -'0', 1);
-	memcpy(data->data + strlen(dedicant) + 1, bancnota2 -'0', 1);
-	memcpy(data->data + strlen(dedicant) + 2, dedicat, strlen(dedicat));
-	printf("final");
+	memcpy(data->data + strlen(dedicant), &b1, 4);
+	memcpy(data->data + strlen(dedicant) + 4, &b2, 4);
+	memcpy(data->data + strlen(dedicant) + 8, dedicat, strlen(dedicat));
 	return data;
 } 
 
@@ -73,19 +81,16 @@ int main() {
 	// the vector of bytes u have to work with
 	// good luck :)
 	void *arr = malloc(0);
+	printf("%p\n", &arr);
 	printf("%p\n", arr);
 	int len = 0;
 	char *buffer = (char*) malloc(max_len);
-	printf("%p\n", buffer);
-	printf("aici2\n");
 	fgets(buffer, max_len, stdin);
-	// fscanf(stdin, "%s", buffer);
-	printf("%s", buffer);
 	while (strcmp(buffer, "exit") != 0) {
 		char *command = strtok(buffer, " ");
-		printf("%s\n", command);
+		//printf("comanda: %s\n", command);
 		if (strcmp(command, "insert") == 0) {
-			add_last(arr, &len, run_insert());
+			add_last(&arr, &len, run_insert());
 		} else if (strcmp(command, "insert_at") == 0) {
 
 		} else if (strcmp(command, "delete_at") == 0) {
@@ -95,9 +100,7 @@ int main() {
 		} else if (strcmp(command, "print") == 0) {
 
 		}
-
-		// fgets(buffer, max_len, stdin);
-		fscanf(stdin, "%s", buffer);
+		fgets(buffer, max_len, stdin);
 	}
 
 	free(arr);
