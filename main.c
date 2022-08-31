@@ -81,24 +81,24 @@ int main() {
 	fgets(buffer, max_len, stdin);
 	// fscanf(stdin, "%s", buffer);
 	printf("%s", buffer);
-	// while (strcmp(buffer, "exit") != 0) {
-	// 	char *command = strtok(buffer, " ");
+	while (strcmp(buffer, "exit") != 0) {
+		char *command = strtok(buffer, " ");
+		printf("%s\n", command);
+		if (strcmp(command, "insert") == 0) {
+			add_last(arr, &len, run_insert());
+		} else if (strcmp(command, "insert_at") == 0) {
 
-	// 	if (strcmp(command, "insert") == 0) {
-	// 		add_last(arr, &len, run_insert());
-	// 	} else if (strcmp(command, "insert_at") == 0) {
-
-	// 	} else if (strcmp(command, "delete_at") == 0) {
+		} else if (strcmp(command, "delete_at") == 0) {
 			
-	// 	} else if (strcmp(command, "find") == 0) {
+		} else if (strcmp(command, "find") == 0) {
 
-	// 	} else if (strcmp(command, "print") == 0) {
+		} else if (strcmp(command, "print") == 0) {
 
-	// 	}
+		}
 
-	// 	// fgets(buffer, max_len, stdin);
-	// 	fscanf(stdin, "%s", buffer);
-	// }
+		// fgets(buffer, max_len, stdin);
+		fscanf(stdin, "%s", buffer);
+	}
 
 	free(arr);
 
