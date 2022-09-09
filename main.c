@@ -6,13 +6,24 @@
 #define sizeof_header 5
 
 void* get_last_pos(void *arr, int len) {
+	printf("get_last_pos: arr:%p\n", arr);
 	while(len > 0) {
-		int p;
-		memcpy(&p, arr+1, sizeof(int));
+		int p = 0;
+		
+		memcpy(&p, arr+4, 1);
+		memcpy(&p + 1, arr+3, 1);
+		memcpy(&p + 2, arr+2, 1);
+		memcpy(&p + 3, arr+1, 1);
+
+		// for (int i = 0; i < 4; i++)
+		// 	memcpy(&p + i, arr+4-i, 1);
+
+		printf("p: %d\n", p);
 		arr += p;
+		printf("get_last_pos: arr:%p\n", arr);
 		len--;
 	}
-
+	printf("get_last_pos: return arr:%p\n", arr);
 	return arr;
 }
 
