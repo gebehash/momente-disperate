@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#pragma pack(1)
 #include "structs.h"
 #define MAX_LEN 250
 #define SIZEOF_HEADER 5
@@ -46,7 +47,6 @@ int get_position_by_index(void *arr, int index) {
 		i += get_len_from_header(arr, i);
 		index--;
 	}
-	//printf("return i: %d\n", i);
 	return i;
 }
 
@@ -68,34 +68,28 @@ void print_single(void *arr) {
 	memcpy(&type, arr, 1);
 
 
-	printf("\nTipul %d\n", type);
+	printf("Tipul %d\n", type);
 	
-	unsigned char aux = -1;
+	char *aux = malloc(MAX_LEN);
 	int i = 5;
 	
-	while (aux != 0) {
-		memcpy(&aux, arr + i, 1);
-		printf("%c", (char) aux);
-		i++;
-	}
+	strcpy(aux, arr + i);
+	i += strlen(aux)+1;
+	printf("%s", aux);
 
 	int b1 = 0;
 	memcpy(&b1, arr + i, get_dim(1, type));
 	i += get_dim(1, type);
 
 	int b2 = 0;
-	memcpy(&b2, arr + i, get_dim(1, type));
+	memcpy(&b2, arr + i, get_dim(2, type));
 	i += get_dim(2, type);
-
-	aux = -1;
 	
 	printf(" pentru ");
 
-	while (aux != 0) {
-		memcpy(&aux, arr + i, 1);
-		printf("%c", (char) aux);
-		i++;
-	}
+	strcpy(aux, arr + i);
+	i+=strlen(aux)+1;
+	printf("%s", aux);
 
 	printf("\n");
 
@@ -106,13 +100,13 @@ int add_last(void **arr, int *len, data_structure *data)
 {
 	int sizeof_data = data->header->len;
 	int last_index = get_position_by_index(*arr, *len);
-	*arr = realloc(*arr, last_index + sizeof_data);
- 
+	*arr = realloc(*arr, last_index + sizeof_data + SIZEOF_HEADER);
+
 	memcpy(*arr + last_index, &data->header->type, 1);
 	memcpy(*arr + last_index + 1, &data->header->len, sizeof(int));
 	memcpy(*arr + last_index + SIZEOF_HEADER, data->data, sizeof_data);
 	*len = *len + 1;
- 
+	
 	// printArr(*arr, 100);
 	free(data->header);
 	free(data->data);
@@ -122,6 +116,23 @@ int add_last(void **arr, int *len, data_structure *data)
  
 int add_at(void **arr, int *len, data_structure *data, int index)
 {
+	int sizeof_data = data->header->len;
+	int last_index = get_position_by_index(*arr, *len);
+	*arr = realloc(*arr, last_index + sizeof_data + SIZEOF_HEADER);
+
+	int new_element_pos = get_position_by_index(*arr, index);
+
+	memcpy(*arr + new_element_pos + sizeof_data + SIZEOF_HEADER, *arr + new_element_pos, last_index - new_element_pos + 1);
+	printArr(*arr, 100);
+	memcpy(*arr + new_element_pos, &data->header->type, 1);
+	memcpy(*arr + new_element_pos + 1, &data->header->len, sizeof(int));
+	memcpy(*arr + new_element_pos + SIZEOF_HEADER, data->data, sizeof_data);
+	*len = *len + 1;
+	
+	printArr(*arr, 100);
+	free(data->header);
+	free(data->data);
+	free(data);
 
 	return 0;
 }
@@ -137,17 +148,27 @@ void find(void *data_block, int len, int index)
 {
 	print_single(data_block + get_position_by_index(data_block, index));
 }
- 
+
 int delete_at(void **arr, int *len, int index)
 {
- 
+	int last_index = get_position_by_index(*arr, *len);
+	int index1 = get_position_by_index(*arr, index);
+	int index2 = get_position_by_index(*arr, index + 1);
+
+	memcpy(*arr + index1, *arr + index2, last_index - index2);
+	
+	*arr = realloc(*arr, last_index - (index2 - index1 + 1));
+	*len = *len - 1;
+
 	return 0;
 }
 
-
-
 void print(void *arr, int len) {
-
+	int i = 0;
+	while (i < len) {
+		print_single(arr + get_position_by_index(arr, i));
+		i++;
+	}
 }
  
 data_structure *run_insert() {
@@ -197,17 +218,17 @@ int main() {
 	char *command = strtok(buffer, " ");
  
 	while (strstr(command, "exit") == 0) {
-		if (strcmp(command, "insert") == 0) {
+		if (strstr(command, "insert_at")) {
+			int index = parse_idx();
+			add_at(&arr, &len, run_insert(), index);
+		} else if (strstr(command, "insert")) {
 			add_last(&arr, &len, run_insert());
-			// print_single(arr);
-		} else if (strcmp(command, "insert_at") == 0) {
-			
-		} else if (strcmp(command, "delete_at") == 0) {
- 
-		} else if (strcmp(command, "find") == 0) {
+		} else if (strstr(command, "delete_at")) {
+			delete_at(&arr, &len, parse_idx());
+		} else if (strstr(command, "find")) {
 			find(arr, len, parse_idx());
-		} else if (strcmp(command, "print") == 0) {
-			
+		} else if (strstr(command, "print")) {
+			print(arr, len);
 		}
 		fgets(buffer, MAX_LEN, stdin);
 		command = strtok(buffer, " ");
