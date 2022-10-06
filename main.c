@@ -94,6 +94,7 @@ void print_single(void *arr) {
 	printf("\n");
 
 	print_by_format_specifier(type, b1, b2);
+	free(aux);
 }
 
 int add_last(void **arr, int *len, data_structure *data)
@@ -116,6 +117,8 @@ int add_last(void **arr, int *len, data_structure *data)
  
 int add_at(void **arr, int *len, data_structure *data, int index)
 {
+	if (index > *len)
+		index = *len;
 	int sizeof_data = data->header->len;
 	int last_index = get_position_by_index(*arr, *len);
 	*arr = realloc(*arr, last_index + sizeof_data + SIZEOF_HEADER);
@@ -123,13 +126,13 @@ int add_at(void **arr, int *len, data_structure *data, int index)
 	int new_element_pos = get_position_by_index(*arr, index);
 
 	memcpy(*arr + new_element_pos + sizeof_data + SIZEOF_HEADER, *arr + new_element_pos, last_index - new_element_pos + 1);
-	printArr(*arr, 100);
+	// printArr(*arr, 100);
 	memcpy(*arr + new_element_pos, &data->header->type, 1);
 	memcpy(*arr + new_element_pos + 1, &data->header->len, sizeof(int));
 	memcpy(*arr + new_element_pos + SIZEOF_HEADER, data->data, sizeof_data);
 	*len = *len + 1;
 	
-	printArr(*arr, 100);
+	// printArr(*arr, 100);
 	free(data->header);
 	free(data->data);
 	free(data);
@@ -151,13 +154,16 @@ void find(void *data_block, int len, int index)
 
 int delete_at(void **arr, int *len, int index)
 {
+	if (*len == 0)
+		return 0;
+
 	int last_index = get_position_by_index(*arr, *len);
 	int index1 = get_position_by_index(*arr, index);
 	int index2 = get_position_by_index(*arr, index + 1);
 
 	memcpy(*arr + index1, *arr + index2, last_index - index2);
 	
-	*arr = realloc(*arr, last_index - (index2 - index1 + 1));
+	*arr = realloc(*arr, last_index - (index2 - index1));
 	*len = *len - 1;
 
 	return 0;
